@@ -1,15 +1,17 @@
 ﻿using BankingApp.Models;
+using BankingApp.ViewModels;
+using System.Collections.Generic;
 using System.Net.Http;
 
 namespace BankingApp.Core.FinancialServices
 {
     public interface IFinancialService
     {
-        HttpResponseMessage GetBalance(int userId);
-        HttpResponseMessage Deposite(int userId, double amount);
-        HttpResponseMessage Withdraw(int userId, double amount);
-        HttpResponseMessage Transfer(int fromUserId, int toUserId, double amount);
-        HttpResponseMessage GetTransactionsStatements(int userId);
+        ResponseViewModel<double> GetBalance(int userId);
+        ResponseViewModel<double> Deposite(int userId, double amount);
+        ResponseViewModel<double> Withdraw(int userId, double amount);
+        ResponseViewModel<double> Transfer(TransferViewModel transferModel);
+        ResponseViewModel<List<TransactionViewModel>> GetTransactionsStatements(int userId);
         void AddTransaction(User user, double amount);
     }
 }

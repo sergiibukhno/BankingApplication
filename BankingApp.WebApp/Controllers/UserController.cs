@@ -1,9 +1,4 @@
 ﻿using BankingApp.Core.UserServices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 
 namespace BankingApp.WebApp.Controllers
@@ -17,10 +12,19 @@ namespace BankingApp.WebApp.Controllers
             userService = UserService;
         }
 
-        public HttpResponseMessage Get(int id)
+        public IHttpActionResult Get(int id)
         {
-            var result = userService.GetRegisteredUsers(id);
-            return result;
+            var requestResult = userService.GetRegisteredUsers(id);
+
+            if (requestResult.success)
+            {
+                return Ok(requestResult.responseContent);
+            }
+
+            else
+            {
+                return BadRequest(requestResult.errorMessage);
+            }
         }      
     }
 }

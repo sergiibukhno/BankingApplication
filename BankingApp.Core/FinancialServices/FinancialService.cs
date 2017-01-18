@@ -13,181 +13,149 @@ namespace BankingApp.Core.FinancialServices
 {
     public class FinancialService:IFinancialService
     {
-        private IUnitOfWork _unitOfWork;
+        private IUnitOfWorkFactory _unitOfWorkFactory;
 
-        public FinancialService(IUnitOfWork unitOfWork)
+        public FinancialService(IUnitOfWorkFactory unitOfWorkFactory)
         {
-            _unitOfWork = unitOfWork;
+            _unitOfWorkFactory = unitOfWorkFactory;
         }
 
-        public HttpResponseMessage GetBalance(int userId)
+        public ResponseViewModel<double> GetBalance(int userId)
         {
-            try
+            using(var unitOfWork = _unitOfWorkFactory.GetUnitOfWork())
             {
-                var user = _unitOfWork.Users.Get(userId);
+                var user = unitOfWork.Users.GetUser(userId);
 
                 if (user != null)
                 {
-                    HttpResponseMessage response = new HttpResponseMessage();
-                    response.Content = new ObjectContent(user[0].Balance.GetType(),user[0].Balance,new XmlMediaTypeFormatter());
-                    return response;
+                    return new ResponseViewModel<double> { responseContent=user.Balance,success=true};
                 }
                 
                 else
                 {
-                    return new HttpResponseMessage(HttpStatusCode.BadRequest); 
+                    return new ResponseViewModel<double> { errorMessage="User not found",success=false};
                 }
-                
-            }
-            
-            catch (Exception ex)
-            {
-                
-            }
-
-            return new HttpResponseMessage(HttpStatusCode.BadRequest);
+            }            
         }
 
-        public HttpResponseMessage Deposite(int userId, double amount)
+        public ResponseViewModel<double> Deposite(int userId, double amount)
         {
-            try
+            using (var unitOfWork = _unitOfWorkFactory.GetUnitOfWork())
             {
-                var user = _unitOfWork.Users.Get(userId);
+                var user = unitOfWork.Users.GetUser(userId);
 
                 if (user != null)
                 {
-                    user[0].Balance += amount;
-                    AddTransaction(user[0], amount);
-                    _unitOfWork.Save();
+                    user.Balance += amount;
+                    AddTransaction(user, amount);
+                    unitOfWork.Save();
+                    return new ResponseViewModel<double> { responseContent = user.Balance, success = true };
                 }
-                
+
                 else
                 {
-                    return new HttpResponseMessage(HttpStatusCode.BadRequest);
+                    return new ResponseViewModel<double> { errorMessage = "User not found", success = false };
                 }                
-
-                return GetBalance(userId);
             }
-            
-            catch (Exception ex)
-            {
-                
-            }
-
-            return new HttpResponseMessage(HttpStatusCode.BadRequest);
         }
 
-        public HttpResponseMessage Withdraw(int userId, double amount)
+        public ResponseViewModel<double> Withdraw(int userId, double amount)
         {
-            try
+            using (var unitOfWork = _unitOfWorkFactory.GetUnitOfWork())
             {
-                    var user = _unitOfWork.Users.Get(userId);
+                var user = unitOfWork.Users.GetUser(userId);
 
-                    if (user != null)
+                if (user != null)
+                {
+                    if (user.Balance >= amount)
                     {
-                        if (user[0].Balance >= amount)
-                        {
-                            user[0].Balance -= amount;
-                            AddTransaction(user[0], -amount);
-                            _unitOfWork.Save();
-                        }
-                        else
-                        {
-                            return new HttpResponseMessage(HttpStatusCode.BadRequest);
-                        }
+                        user.Balance -= amount;
+                        AddTransaction(user, -amount);
+                        unitOfWork.Save();
+                        return new ResponseViewModel<double> { responseContent = user.Balance, success = true };
                     }
                     else
                     {
-                        return new HttpResponseMessage(HttpStatusCode.BadRequest);
+                        return new ResponseViewModel<double> { errorMessage = "You dont have enough money", success = false };
                     }
+                }
                 
-                return GetBalance(userId);
+                else
+                {
+                    return new ResponseViewModel<double> { errorMessage = "User not found", success = false };
+                }                
             }
-            
-            catch (Exception ex)
-            {
-                
-            }
-
-            return new HttpResponseMessage(HttpStatusCode.BadRequest);
         }
 
-        public HttpResponseMessage Transfer(int fromUserId, int toUserId, double amount)
+        public ResponseViewModel<double> Transfer(TransferViewModel transferModel)
         {
-            if (toUserId <= 0 || amount <= 0)
+            if (transferModel.toUserId <= 0 || transferModel.amount <= 0)
             {
-                return new HttpResponseMessage(HttpStatusCode.BadRequest);
+                return new ResponseViewModel<double> { errorMessage = "Check input data", success = false };
             }
 
-            if (fromUserId == toUserId)
+            if (transferModel.fromUserId == transferModel.toUserId)
             {
-                return new HttpResponseMessage(HttpStatusCode.BadRequest);
+                return new ResponseViewModel<double> { errorMessage = "Cannot transfer to yourself", success = false };
             }
-            
-            try
-            {
-                    var sendingUser = _unitOfWork.Users.Get(fromUserId);
-                    var receivingUser = _unitOfWork.Users.Get(toUserId);
 
-                    if (sendingUser != null && receivingUser != null)
+            using (var unitOfWork = _unitOfWorkFactory.GetUnitOfWork())
+            {
+                var sendingUser = unitOfWork.Users.GetUser(transferModel.fromUserId);
+                var receivingUser = unitOfWork.Users.GetUser(transferModel.toUserId);
+
+                if (sendingUser != null && receivingUser != null)
+                {
+                    if (sendingUser.Balance >= transferModel.amount)
                     {
-                        if (sendingUser[0].Balance >= amount)
-                        {
-                            sendingUser[0].Balance -= amount;
-                            receivingUser[0].Balance += amount;
+                        sendingUser.Balance -= transferModel.amount;
+                        receivingUser.Balance += transferModel.amount;
 
-                            AddTransaction(sendingUser[0], -amount);
-                            AddTransaction(receivingUser[0], amount);
-                            _unitOfWork.Save();
-                        }
-                        else
-                        {
-                            return new HttpResponseMessage(HttpStatusCode.BadRequest);
-                        }
+                        AddTransaction(sendingUser, -transferModel.amount);
+                        AddTransaction(receivingUser, transferModel.amount);
+                        unitOfWork.Save();
+                        return new ResponseViewModel<double> { responseContent = sendingUser.Balance, success = true };
                     }
                     else
                     {
-                        return new HttpResponseMessage(HttpStatusCode.BadRequest);
+                        return new ResponseViewModel<double> { errorMessage = "You dont have enough money", success = false };
                     }
+                }
                 
-                return GetBalance(fromUserId);
+                else
+                {
+                    return new ResponseViewModel<double> { errorMessage = "User not found", success = false };
+                }                
             }
-            
-            catch (Exception ex)
-            {
-               
-            }
-
-            return new HttpResponseMessage(HttpStatusCode.BadRequest);
         }
 
-        public HttpResponseMessage GetTransactionsStatements(int userId)
+        public ResponseViewModel<List<TransactionViewModel>> GetTransactionsStatements(int userId)
         {
-            try
+            using (var unitOfWork = _unitOfWorkFactory.GetUnitOfWork())
             {
-                var userTransactions = _unitOfWork.Transactions.Get(userId)
-                    .Select(r => new Transaction
-                         {
-                             amount = r.Amount,
-                             TransactionTime = r.TransactionTime
+                var user = unitOfWork.Users.GetUser(userId);
+                if (user != null)
+                {
+                    var userTransactions = unitOfWork.Transactions.Get(userId)
+                        .Select(r => new TransactionViewModel
+                             {
+                                 amount = r.Amount,
+                                 TransactionTime = r.TransactionTime
 
-                         }).ToList();
-                
-                HttpResponseMessage response = new HttpResponseMessage();
-                response.Content = new ObjectContent(userTransactions.GetType(), userTransactions, new XmlMediaTypeFormatter());
-                return response;                                
-            }
-            
-            catch (Exception ex)
-            {
-                
-            }
+                             }).ToList();
 
-            return new HttpResponseMessage(HttpStatusCode.BadRequest);
+                    return new ResponseViewModel<List<TransactionViewModel>> { responseContent = userTransactions, success = true };
+                }
+
+                else
+                {
+                    return new ResponseViewModel<List<TransactionViewModel>> { errorMessage = "User not found", success = false };
+                }                
+            }
         }
 
         
-        public void AddTransaction(Models.User user, double amount)
+        public void AddTransaction(User user, double amount)
         {
             if (user.FinancialTransactions == null)
                 user.FinancialTransactions = new Collection<FinancialTransaction>();

@@ -17,6 +17,7 @@ namespace BankingApp.WebApp
             container.RegisterType<IUnitOfWork, UnitOfWork>();
             container.RegisterType<IFinancialService, FinancialService>();
             container.RegisterType<IUserService, UserService>();
+            container.RegisterType<IUnitOfWorkFactory, UnitOfWorkFactory>();
             GlobalConfiguration.Configuration.DependencyResolver = new UnityDependencyResolver(container);
         }
     }

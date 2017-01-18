@@ -1,5 +1,4 @@
 ﻿using BankingApp.Core.FinancialServices;
-using System.Net.Http;
 using System.Web.Http;
 
 namespace BankingApp.WebApp.Controllers
@@ -13,10 +12,19 @@ namespace BankingApp.WebApp.Controllers
             financialService = FinancialService;
         }
         
-        public HttpResponseMessage Get(int id)
+        public IHttpActionResult Get(int id)
         {
-            var result = financialService.GetTransactionsStatements(id);
-            return result;
+            var requestResult = financialService.GetTransactionsStatements(id);
+
+            if (requestResult.success)
+            {
+                return Ok(requestResult.responseContent);
+            }
+
+            else
+            {
+                return BadRequest(requestResult.errorMessage);
+            }
         }
     }
 }

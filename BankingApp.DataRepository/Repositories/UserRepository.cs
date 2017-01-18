@@ -19,12 +19,12 @@ namespace BankingApp.DataRepository.Repositories
             return _dataContext.Users.ToList();
         }
 
-        public List<User> Get(int id)
+        public User GetUser(int id)
         {
-            var queryResult = (from user in _dataContext.Users
+            var queryResult = from user in _dataContext.Users
                                where user.Id == id
-                               select user).ToList();
-            return queryResult;
+                               select user;
+            return queryResult.FirstOrDefault();
         }
 
         public void Create(User item)

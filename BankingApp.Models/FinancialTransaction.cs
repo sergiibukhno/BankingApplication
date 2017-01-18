@@ -8,6 +8,5 @@ namespace BankingApp.Models
         public double Amount { get; set; }
         public DateTime TransactionTime { get; set; }
         public virtual User User { get; set; }
-        public FinancialTransaction() { }
     }
 }

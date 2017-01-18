@@ -1,9 +1,11 @@
-﻿using System.Net.Http;
+﻿using BankingApp.ViewModels;
+using System.Collections.Generic;
+using System.Net.Http;
 
 namespace BankingApp.Core.UserServices
 {
     public interface IUserService
     {
-        HttpResponseMessage GetRegisteredUsers(int userNotToSelect);
+        ResponseViewModel<List<UserViewModel>> GetRegisteredUsers(int userToExclude);
     }
 }

@@ -3,7 +3,7 @@ using System;
 
 namespace BankingApp.DataRepository.UnitOfWork
 {
-    public class UnitOfWork:IUnitOfWork,IDisposable
+    public class UnitOfWork:IUnitOfWork
     {
         private DataContext.DataContext _dataContext;
         private FinancialTransactionRepository transactionRepo;

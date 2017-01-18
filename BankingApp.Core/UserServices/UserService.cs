@@ -1,6 +1,7 @@
 ﻿using BankingApp.DataRepository.UnitOfWork;
 using BankingApp.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -10,37 +11,28 @@ namespace BankingApp.Core.UserServices
 {
     public class UserService:IUserService
     {
-        private IUnitOfWork _unitOfWork;
+        private IUnitOfWorkFactory _unitOfWorkFactory;
 
-        public UserService(IUnitOfWork unitOfWork)
+        public UserService(IUnitOfWorkFactory unitOfWorkFactory)
         {
-            _unitOfWork = unitOfWork;
+            _unitOfWorkFactory = unitOfWorkFactory;
         }
 
-        public HttpResponseMessage GetRegisteredUsers(int userNotToSelect)
+        public ResponseViewModel<List<UserViewModel>> GetRegisteredUsers(int userToExclude)
         {
-            try
+            using (var unitOfWork = _unitOfWorkFactory.GetUnitOfWork())
             {
-                var users = _unitOfWork.Users.GetAll()
-                    .Where(s=>s.Id!=userNotToSelect)
-                    .Select(r => new User
+                var users = unitOfWork.Users.GetAll()
+                    .Where(s => s.Id != userToExclude)
+                    .Select(r => new UserViewModel
                     {
                         Id = r.Id,
                         Name = r.Name
 
                     }).ToList();
 
-                HttpResponseMessage response = new HttpResponseMessage();
-                response.Content = new ObjectContent(users.GetType(), users, new XmlMediaTypeFormatter());
-                return response;
+                return new ResponseViewModel<List<UserViewModel>> { responseContent = users, success = true };
             }
-
-            catch (Exception ex)
-            {
-
-            }
-
-            return new HttpResponseMessage(HttpStatusCode.BadRequest);
         }
     }
 }

@@ -1,7 +1,5 @@
 ﻿using BankingApp.Core.FinancialServices;
 using BankingApp.ViewModels;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 
 namespace BankingApp.WebApp.Controllers
@@ -15,13 +13,22 @@ namespace BankingApp.WebApp.Controllers
             financialService = FinancialService;
         }
         
-        public HttpResponseMessage Post(Transfer transferModel)
+        public IHttpActionResult Post(TransferViewModel transferModel)
         {
             if (transferModel == null)
-                return new HttpResponseMessage(HttpStatusCode.BadRequest);
+                return BadRequest("Check input data");
 
-            var result = financialService.Transfer(transferModel.fromUserId, transferModel.toUserId, transferModel.amount);
-            return result;
+            var requestResult = financialService.Transfer(transferModel);
+
+            if (requestResult.success)
+            {
+                return Ok(requestResult.responseContent);
+            }
+
+            else
+            {
+                return BadRequest(requestResult.errorMessage);
+            }
         }
     }
 }

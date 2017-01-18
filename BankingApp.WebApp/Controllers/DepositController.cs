@@ -1,7 +1,5 @@
 ﻿using BankingApp.Core.FinancialServices;
 using BankingApp.ViewModels;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 
 namespace BankingApp.WebApp.Controllers
@@ -15,13 +13,22 @@ namespace BankingApp.WebApp.Controllers
             financialService = FinancialService;
         }
         
-        public HttpResponseMessage Post(Deposit depositModel)
+        public IHttpActionResult Post(DepositViewModel depositModel)
         {
             if (depositModel == null || depositModel.amount <= 0)
-                return new HttpResponseMessage(HttpStatusCode.BadRequest);
-            
-            var result = financialService.Deposite(depositModel.userId, depositModel.amount);
-            return result;
+                return BadRequest("Check input data");
+
+            var requestResult = financialService.Deposite(depositModel.userId, depositModel.amount);
+
+            if (requestResult.success)
+            {
+                return Ok(requestResult.responseContent);
+            }
+
+            else
+            {
+                return BadRequest(requestResult.errorMessage);
+            }
         }
     }
 }
