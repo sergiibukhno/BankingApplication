@@ -5,8 +5,8 @@ namespace BankingApp.DataRepository.UnitOfWork
 {
     public interface IUnitOfWork:IDisposable
     {
-        FinancialTransactionRepository Transactions { get; }
-        UserRepository Users { get; }
+        IFinancialTransactionRepository Transactions { get; }
+        IUserRepository Users { get; }
         void Save();
     }
 }

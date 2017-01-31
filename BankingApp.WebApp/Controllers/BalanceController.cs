@@ -3,6 +3,7 @@ using System.Web.Http;
 
 namespace BankingApp.WebApp.Controllers
 {
+    [Authorize]
     public class BalanceController : ApiController
     {
         private IFinancialService financialService;
@@ -23,7 +24,7 @@ namespace BankingApp.WebApp.Controllers
 
             else
             {
-                return BadRequest(requestResult.errorMessage);
+                return BadRequest(requestResult.message);
             }
         }       
     }

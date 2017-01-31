@@ -6,15 +6,15 @@ namespace BankingApp.DataRepository.UnitOfWork
     public class UnitOfWork:IUnitOfWork
     {
         private DataContext.DataContext _dataContext;
-        private FinancialTransactionRepository transactionRepo;
-        private UserRepository userRepo;
+        private IFinancialTransactionRepository transactionRepo;
+        private IUserRepository userRepo;
 
         public UnitOfWork()
         {
             _dataContext = new DataContext.DataContext(); 
         }
 
-        public FinancialTransactionRepository Transactions
+        public IFinancialTransactionRepository Transactions
         {
             get
             {
@@ -24,7 +24,7 @@ namespace BankingApp.DataRepository.UnitOfWork
             }
         }
 
-        public UserRepository Users
+        public virtual IUserRepository Users
         {
             get
             {

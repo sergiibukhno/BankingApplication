@@ -4,6 +4,7 @@ using System.Web.Http;
 
 namespace BankingApp.WebApp.Controllers
 {
+    [Authorize]
     public class DepositController : ApiController
     {
         private IFinancialService financialService;
@@ -18,7 +19,7 @@ namespace BankingApp.WebApp.Controllers
             if (depositModel == null || depositModel.amount <= 0)
                 return BadRequest("Check input data");
 
-            var requestResult = financialService.Deposite(depositModel.userId, depositModel.amount);
+            var requestResult = financialService.PerformFinancialOperation(depositModel);
 
             if (requestResult.success)
             {
@@ -27,7 +28,7 @@ namespace BankingApp.WebApp.Controllers
 
             else
             {
-                return BadRequest(requestResult.errorMessage);
+                return BadRequest(requestResult.message);
             }
         }
     }

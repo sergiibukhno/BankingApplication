@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A5EEC8DA-39DB-4E6A-8B91-709FFC3B6378}</ProjectGuid>
+    <ProjectGuid>{6DE40424-0D56-4E22-AE2F-A47B6FE2EE05}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BankingApp.Core</RootNamespace>
-    <AssemblyName>BankingApp.Core</AssemblyName>
+    <RootNamespace>BankingApp.Core.Tests</RootNamespace>
+    <AssemblyName>BankingApp.Core.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -56,29 +56,42 @@
     <Reference Include="BankingApp.DataRepository">
       <HintPath>..\BankingApp.DataRepository\bin\Debug\BankingApp.DataRepository.dll</HintPath>
     </Reference>
-    <Reference Include="JWT, Version=1.3.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\JWT.1.3.4\lib\3.5\JWT.dll</HintPath>
+    <Reference Include="BankingApp.Models, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\BankingApp.Models\bin\Debug\BankingApp.Models.dll</HintPath>
+    </Reference>
+    <Reference Include="BankingApp.WebApp">
+      <HintPath>..\BankingApp.WebApp\bin\BankingApp.WebApp.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Castle.Core.3.3.3\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Moq, Version=4.5.30.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <HintPath>..\packages\Moq.4.5.30\lib\net45\Moq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.framework, Version=3.6.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AccountServices\AccountService.cs" />
-    <Compile Include="AccountServices\IAccountService.cs" />
-    <Compile Include="FinancialServices\FinancialService.cs" />
-    <Compile Include="FinancialServices\IFinancialService.cs" />
+    <Compile Include="AccountServiceTests.cs" />
+    <Compile Include="FinancialServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UserServices\IUserService.cs" />
-    <Compile Include="UserServices\UserService.cs" />
+    <Compile Include="UserServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BankingApp.Models\BankingApp.Models.csproj">
-      <Project>{5b18e712-fb71-4573-b289-889b471bbbde}</Project>
-      <Name>BankingApp.Models</Name>
+    <ProjectReference Include="..\BankingApp.Core\BankingApp.Core.csproj">
+      <Project>{a5eec8da-39db-4e6a-8b91-709ffc3b6378}</Project>
+      <Name>BankingApp.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\BankingApp.ViewModels\BankingApp.ViewModels.csproj">
       <Project>{f1183588-0cf2-4a58-a483-b5078c1e8a7f}</Project>
@@ -86,10 +99,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

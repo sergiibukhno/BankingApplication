@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace BankingApp.DataRepository.Repositories
 {
-    public class FinancialTransactionRepository : IRepository<FinancialTransaction>
+    public class FinancialTransactionRepository : IRepository<FinancialTransaction>,IFinancialTransactionRepository
     {
         private IDataContext _dataContext;
 

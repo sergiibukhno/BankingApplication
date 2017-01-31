@@ -1,3 +1,4 @@
+using BankingApp.Core.AccountServices;
 using BankingApp.Core.FinancialServices;
 using BankingApp.Core.UserServices;
 using BankingApp.DataRepository.DataContext;
@@ -18,6 +19,8 @@ namespace BankingApp.WebApp
             container.RegisterType<IFinancialService, FinancialService>();
             container.RegisterType<IUserService, UserService>();
             container.RegisterType<IUnitOfWorkFactory, UnitOfWorkFactory>();
+            container.RegisterType<IAccountService, AccountService>();
+            container.RegisterType<IAppSettings, AppSettingsWrapper>();
             GlobalConfiguration.Configuration.DependencyResolver = new UnityDependencyResolver(container);
         }
     }

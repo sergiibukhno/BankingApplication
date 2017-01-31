@@ -8,10 +8,8 @@ namespace BankingApp.Core.FinancialServices
     public interface IFinancialService
     {
         ResponseViewModel<double> GetBalance(int userId);
-        ResponseViewModel<double> Deposite(int userId, double amount);
-        ResponseViewModel<double> Withdraw(int userId, double amount);
-        ResponseViewModel<double> Transfer(TransferViewModel transferModel);
         ResponseViewModel<List<TransactionViewModel>> GetTransactionsStatements(int userId);
+        ResponseViewModel<double> PerformFinancialOperation(FinancialOperationViewModel financialOperation);
         void AddTransaction(User user, double amount);
     }
 }

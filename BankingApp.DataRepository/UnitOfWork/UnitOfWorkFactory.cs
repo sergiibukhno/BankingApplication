@@ -3,7 +3,7 @@ namespace BankingApp.DataRepository.UnitOfWork
 {
     public class UnitOfWorkFactory:IUnitOfWorkFactory
     {
-        public UnitOfWork GetUnitOfWork()
+        public IUnitOfWork GetUnitOfWork()
         {
             return new UnitOfWork();
         }

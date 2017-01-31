@@ -1,4 +1,5 @@
-﻿using System.Web.Http;
+﻿using BankingApp.WebApp.App_Start;
+using System.Web.Http;
 
 namespace BankingApp.WebApp
 {
@@ -13,6 +14,8 @@ namespace BankingApp.WebApp
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+
+            config.MessageHandlers.Add(new AuthHandler());
         }
     }
 }

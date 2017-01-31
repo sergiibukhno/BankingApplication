@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace BankingApp.DataRepository.Repositories
 {
-    public class UserRepository:IRepository<User>
+    public class UserRepository:IRepository<User>,IUserRepository
     {
         private IDataContext _dataContext;
 
@@ -24,6 +24,14 @@ namespace BankingApp.DataRepository.Repositories
             var queryResult = from user in _dataContext.Users
                                where user.Id == id
                                select user;
+            return queryResult.FirstOrDefault();
+        }
+
+        public User GetUserByName(string name)
+        {
+            var queryResult = from user in _dataContext.Users
+                              where user.Name == name
+                              select user;
             return queryResult.FirstOrDefault();
         }
 
