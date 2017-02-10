@@ -1,11 +1,12 @@
 ﻿using BankingApp.Core.FinancialServices;
 using BankingApp.ViewModels;
 using System.Web.Http;
+using System.Linq;
 
 namespace BankingApp.WebApp.Controllers
 {
     [Authorize]
-    public class DepositController : ApiController
+    public class DepositController : BaseApiController
     {
         private IFinancialService financialService;
         
@@ -16,19 +17,28 @@ namespace BankingApp.WebApp.Controllers
         
         public IHttpActionResult Post(DepositViewModel depositModel)
         {
-            if (depositModel == null || depositModel.amount <= 0)
-                return BadRequest("Check input data");
-
-            var requestResult = financialService.PerformFinancialOperation(depositModel);
-
-            if (requestResult.success)
+            if (ModelState.IsValid)
             {
-                return Ok(requestResult.responseContent);
-            }
+                depositModel.userId = GetCurrentUserId();
+                var requestResult = financialService.Deposit(depositModel);
 
+                if (requestResult.success)
+                {
+                    return Ok(requestResult.responseContent);
+                }
+
+                else
+                {
+                    return BadRequest(requestResult.message);
+                }
+            }
             else
             {
-                return BadRequest(requestResult.message);
+                string validationErrors = string.Join(", ",
+                    ModelState.Values.SelectMany(E => E.Errors)
+                    .Select(E => E.ErrorMessage)
+                    .ToArray());
+                return BadRequest(validationErrors);
             }
         }
     }

@@ -1,0 +1,13 @@
+﻿<div class="container text-center">
+    <br />
+    <h2>It's an awesome banking application</h2>
+    <p>Using our app you can deposit, withdraw or transfer your money</p>
+    <p ng-show="userAuth===false">To use these services just sign up now or log in if you have an account</p>
+
+    <div class="btn-group">
+        <a href="/Register" class="btn btn-lg btn-info" ng-show="userAuth===false">Sign up</a>
+        <a href="/Login" class="btn btn-lg btn-info" ng-show="userAuth===false">Login</a>
+    </div>
+</div>
+
+

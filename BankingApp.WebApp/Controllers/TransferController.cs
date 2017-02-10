@@ -5,7 +5,7 @@ using System.Web.Http;
 namespace BankingApp.WebApp.Controllers
 {
     [Authorize]
-    public class TransferController : ApiController
+    public class TransferController : BaseApiController
     {
         private IFinancialService financialService;
         
@@ -19,10 +19,12 @@ namespace BankingApp.WebApp.Controllers
             if (transferModel == null || transferModel.toUserId <= 0 || transferModel.amount <= 0)
                 return BadRequest("Check input data");
 
+            transferModel.userId = GetCurrentUserId();
+
             if (transferModel.userId == transferModel.toUserId)
                 return BadRequest("Cannot transfer to yourself");
-            
-            var requestResult = financialService.PerformFinancialOperation(transferModel);
+
+            var requestResult = financialService.Transfer(transferModel);
 
             if (requestResult.success)
             {

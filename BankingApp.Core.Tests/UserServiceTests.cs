@@ -15,10 +15,10 @@ namespace BankingApp.Core.Tests
         [Test]
         public void GetRegisteredUsers_WrongIdToExclude_ErrorMessage()
         {
-            var _mock = new Mock<IUnitOfWorkFactory>();
-            var mockUnit = new Mock<IUnitOfWork>();
-            _mock.Setup(m => m.GetUnitOfWork()).Returns(mockUnit.Object);
-            var userService = new UserService(_mock.Object);
+            var _mockUnitOfWorkFactory = new Mock<IUnitOfWorkFactory>();
+            var mockUnitOfWork = new Mock<IUnitOfWork>();
+            _mockUnitOfWorkFactory.Setup(m => m.GetUnitOfWork()).Returns(mockUnitOfWork.Object);
+            var userService = new UserService(_mockUnitOfWorkFactory.Object);
             Random random = new Random();
             
             int randomWrongId = random.Next(-100, 0);
@@ -27,7 +27,7 @@ namespace BankingApp.Core.Tests
             Assert.AreEqual(false,result.success);
             Assert.AreEqual("Wrong id", result.message);
             Assert.AreEqual(null, result.responseContent);
-            _mock.Verify(mock => mock.GetUnitOfWork(), Times.Never());
+            _mockUnitOfWorkFactory.Verify(mock => mock.GetUnitOfWork(), Times.Never());
         }
 
         [Test]
@@ -38,13 +38,13 @@ namespace BankingApp.Core.Tests
                                          new User{Id=3,Name="Magisk",Balance=0},
                                          new User{Id=4,Name="James",Balance=25}
                                        };                      
-            var mockRepo = new Mock<IUserRepository>();
-            mockRepo.Setup(r => r.GetAll()).Returns(users);
-            var mockUnit = new Mock<IUnitOfWork>();
-            mockUnit.Setup(u => u.Users).Returns(mockRepo.Object);
-            var _mock = new Mock<IUnitOfWorkFactory>();
-            _mock.Setup(m => m.GetUnitOfWork()).Returns(mockUnit.Object);
-            var userService = new UserService(_mock.Object);
+            var mockUserRepo = new Mock<IUserRepository>();
+            mockUserRepo.Setup(r => r.GetAll()).Returns(users);
+            var mockUnitOfWork = new Mock<IUnitOfWork>();
+            mockUnitOfWork.Setup(u => u.Users).Returns(mockUserRepo.Object);
+            var _mockUnitOfWorkFactory = new Mock<IUnitOfWorkFactory>();
+            _mockUnitOfWorkFactory.Setup(m => m.GetUnitOfWork()).Returns(mockUnitOfWork.Object);
+            var userService = new UserService(_mockUnitOfWorkFactory.Object);
             int idToExclude = 2;
 
             var result = userService.GetRegisteredUsers(idToExclude);
@@ -56,8 +56,8 @@ namespace BankingApp.Core.Tests
             {
                 Assert.AreNotEqual(idToExclude, user.Id);
             }
-            _mock.Verify(mock => mock.GetUnitOfWork(), Times.Once());
-            mockRepo.Verify(r => r.GetAll(), Times.Once());
+            _mockUnitOfWorkFactory.Verify(mock => mock.GetUnitOfWork(), Times.Once());
+            mockUserRepo.Verify(r => r.GetAll(), Times.Once());
         }
     }
 }

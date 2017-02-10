@@ -1,25 +1,21 @@
 ﻿using System.Text;
 using System.Security.Cryptography;
-using JWT;
-using System.Collections.Generic;
-using System;
 using BankingApp.Models;
 using BankingApp.ViewModels;
 using BankingApp.DataRepository.UnitOfWork;
-using System.Configuration;
-using System.Collections.Specialized;
+using BankingApp.Core.TokenHandler;
 
 namespace BankingApp.Core.AccountServices
 {
     public class AccountService:IAccountService
     {
         private IUnitOfWorkFactory _unitOfWorkFactory;
-        private IAppSettings _appSettings;
+        private ITokenHandler _tokenHandler;
 
-        public AccountService(IUnitOfWorkFactory unitOfWorkFactory,IAppSettings appSettings)
+        public AccountService(IUnitOfWorkFactory unitOfWorkFactory,ITokenHandler tokenHandler)
         {
             _unitOfWorkFactory = unitOfWorkFactory;
-            _appSettings = appSettings;
+            _tokenHandler = tokenHandler;
         }
         
         public string EncryptPassword(string inputString)
@@ -28,25 +24,6 @@ namespace BankingApp.Core.AccountServices
             data = new SHA256Managed().ComputeHash(data);
             string hash = Encoding.ASCII.GetString(data);
             return hash;
-        }
-
-        public string CreateToken(User user)
-        {
-            var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            var expiry = Math.Round((DateTime.UtcNow.AddDays(30) - unixEpoch).TotalSeconds);
-          
-            var payload = new Dictionary<string, object>
-            {
-                {"name", user.Name},
-                {"userId", user.Id},
-                {"exp", expiry}
-            };
-
-            string key = _appSettings["key"];
-
-            var token = JsonWebToken.Encode(payload, key, JwtHashAlgorithm.HS256);
-            
-            return token;
         }
 
         public ResponseViewModel<string> Register(RegisterViewModel registerModel)
@@ -68,8 +45,8 @@ namespace BankingApp.Core.AccountServices
                 };
 
                 unitOfWork.Users.Create(user);
-                unitOfWork.Save();                
-                var token = CreateToken(user);
+                unitOfWork.Save();
+                var token = _tokenHandler.CreateToken(user);
 
                 return new ResponseViewModel<string> { responseContent = token, message = "Registration successfully completed", success = true };
             }           
@@ -93,7 +70,7 @@ namespace BankingApp.Core.AccountServices
 
                     if (loginSuccess)
                     {
-                        var token = CreateToken(existingUser);
+                        var token = _tokenHandler.CreateToken(existingUser);
                         return new ResponseViewModel<string> { responseContent = token, message = "Login successful", success = true };
                     }
                     else
@@ -101,28 +78,6 @@ namespace BankingApp.Core.AccountServices
                         return new ResponseViewModel<string> { message = "Password is wrong", success = false };
                     }
                 }                
-            }
-        }
-    }
-    
-    public interface IAppSettings
-    {
-        string this[string key] { get; }
-    }
-
-    public class AppSettingsWrapper : IAppSettings
-    {
-        private readonly NameValueCollection appSettings;
-
-        public AppSettingsWrapper()
-        {
-            this.appSettings = ConfigurationManager.AppSettings;
-        }
-        public string this[string key]
-        {
-            get
-            {
-                return this.appSettings[key];
             }
         }
     }

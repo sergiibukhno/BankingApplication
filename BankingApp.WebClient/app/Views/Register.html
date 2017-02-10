@@ -1,0 +1,23 @@
+﻿<div class="container">
+    <hr />
+    <form method="POST">
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4">
+                <label for="userName">NAME</label>
+                <input name="userName" class="form-control" type="text" ng-model="username">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4">
+                <label for="password">PASSWORD</label>
+                <input name="password" class="form-control" type="password" ng-model="password">
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4">
+                <button class="btn btn-warning" ng-click="registerSubmit()">Register</button>
+            </div>
+        </div>
+    </form>
+</div>

@@ -4,16 +4,16 @@ using BankingApp.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Formatting;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
+using System.Transactions;
 
 namespace BankingApp.Core.FinancialServices
 {
     public class FinancialService:IFinancialService
     {
         private IUnitOfWorkFactory _unitOfWorkFactory;
+        private static readonly object locker = new object();
 
         public FinancialService(IUnitOfWorkFactory unitOfWorkFactory)
         {
@@ -62,26 +62,96 @@ namespace BankingApp.Core.FinancialServices
                 }                
             }
         }
-
-        public ResponseViewModel<double> PerformFinancialOperation(FinancialOperationViewModel financialOperation)
+        
+        public ResponseViewModel<double> Deposit(DepositViewModel depositModel)
         {
-            using (var unitOfWork = _unitOfWorkFactory.GetUnitOfWork())
+            using (TransactionScope transactionScope = new TransactionScope())
             {
-                if (financialOperation.GetType() == typeof(TransferViewModel))
-                {                                        
-                        var sendingUser = unitOfWork.Users.GetUser(financialOperation.userId);
-                        var receivingUser = unitOfWork.Users.GetUser(financialOperation.toUserId);
+                try
+                {
+                    using (var unitOfWork = _unitOfWorkFactory.GetUnitOfWork())
+                    {
+                        var user = unitOfWork.Users.GetUser(depositModel.userId);
+                        if (user != null)
+                        {
+                            user.Balance += depositModel.amount;
+                            AddTransaction(user, depositModel.amount);
+                            unitOfWork.Save();
+                            transactionScope.Complete();
+                            return new ResponseViewModel<double> { responseContent = user.Balance, success = true };
+                        }
+                        else
+                        {
+                            return new ResponseViewModel<double> { message = "User not found", success = false };
+                        }
+                    }
+                }
+                catch (DbUpdateException)
+                {
+                    var result = Deposit(depositModel);
+                    return result;
+                }
+            }
+        }
 
+        public ResponseViewModel<double> Withdraw(WithdrawViewModel withdrawModel)
+        {
+            using (TransactionScope transactionScope = new TransactionScope())
+            {
+                try
+                {
+                    using (var unitOfWork = _unitOfWorkFactory.GetUnitOfWork())
+                    {
+                        var user = unitOfWork.Users.GetUser(withdrawModel.userId);
+                        if (user != null)
+                        {
+                            if (user.Balance >= withdrawModel.amount)
+                            {
+                                user.Balance -= withdrawModel.amount;
+                                AddTransaction(user, -withdrawModel.amount);
+                                unitOfWork.Save();
+                                transactionScope.Complete();
+                                return new ResponseViewModel<double> { responseContent = user.Balance, success = true };
+                            }
+                            else
+                            {
+                                return new ResponseViewModel<double> { message = "You dont have enough money", success = false };
+                            }
+                        }
+                        else
+                        {
+                            return new ResponseViewModel<double> { message = "User not found", success = false };
+                        }
+                    }
+                }
+                catch (DbUpdateException)
+                {
+                    var result = Withdraw(withdrawModel);
+                    return result;
+                }                
+            }
+        }
+
+        public ResponseViewModel<double> Transfer(TransferViewModel transferModel)
+        {
+            using (TransactionScope transactionScope = new TransactionScope())
+            {
+                try
+                {
+                    using (var unitOfWork = _unitOfWorkFactory.GetUnitOfWork())
+                    {
+                        var sendingUser = unitOfWork.Users.GetUser(transferModel.userId);
+                        var receivingUser = unitOfWork.Users.GetUser(transferModel.toUserId);
                         if (sendingUser != null && receivingUser != null)
                         {
-                            if (sendingUser.Balance >= financialOperation.amount)
+                            if (sendingUser.Balance >= transferModel.amount)
                             {
-                                sendingUser.Balance -= financialOperation.amount;
-                                receivingUser.Balance += financialOperation.amount;
-
-                                AddTransaction(sendingUser, -financialOperation.amount);
-                                AddTransaction(receivingUser, financialOperation.amount);
+                                sendingUser.Balance -= transferModel.amount;
+                                receivingUser.Balance += transferModel.amount;
+                                AddTransaction(sendingUser, -transferModel.amount);
+                                AddTransaction(receivingUser, transferModel.amount);
                                 unitOfWork.Save();
+                                transactionScope.Complete();
                                 return new ResponseViewModel<double> { responseContent = sendingUser.Balance, success = true };
                             }
                             else
@@ -93,50 +163,15 @@ namespace BankingApp.Core.FinancialServices
                         {
                             return new ResponseViewModel<double> { message = "User not found", success = false };
                         }
-                    
+                    }
                 }
-
-                else
+                catch (DbUpdateException)
                 {
-                    var user = unitOfWork.Users.GetUser(financialOperation.userId);
-
-                    if (user != null)
-                    {
-                        if (financialOperation.GetType() == typeof(DepositViewModel))
-                        {
-                            user.Balance += financialOperation.amount;
-                            AddTransaction(user, financialOperation.amount);
-                            unitOfWork.Save();
-                            return new ResponseViewModel<double> { responseContent = user.Balance, success = true };
-                        }
-
-                        else
-                            if (financialOperation.GetType() == typeof(WithdrawViewModel))
-                            {
-                                if (user.Balance >= financialOperation.amount)
-                                {
-                                    user.Balance -= financialOperation.amount;
-                                    AddTransaction(user, -financialOperation.amount);
-                                    unitOfWork.Save();
-                                    return new ResponseViewModel<double> { responseContent = user.Balance, success = true };
-                                }
-                                else
-                                {
-                                    return new ResponseViewModel<double> { message = "You dont have enough money", success = false };
-                                }
-                            }
-                            else
-                            {
-                                return new ResponseViewModel<double> { message = "Contact administrator", success = false };
-                            }
-                    }
-                    else
-                    {
-                        return new ResponseViewModel<double> { message = "User not found", success = false };
-                    }
-                }         
+                    var result = Transfer(transferModel);
+                    return result;
+                }                
             }
-        }       
+        }
         
         public void AddTransaction(User user, double amount)
         {

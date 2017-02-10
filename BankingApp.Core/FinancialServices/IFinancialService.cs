@@ -9,7 +9,9 @@ namespace BankingApp.Core.FinancialServices
     {
         ResponseViewModel<double> GetBalance(int userId);
         ResponseViewModel<List<TransactionViewModel>> GetTransactionsStatements(int userId);
-        ResponseViewModel<double> PerformFinancialOperation(FinancialOperationViewModel financialOperation);
+        ResponseViewModel<double> Deposit(DepositViewModel depositModel);
+        ResponseViewModel<double> Withdraw(WithdrawViewModel withdrawModel);
+        ResponseViewModel<double> Transfer(TransferViewModel transferModel);
         void AddTransaction(User user, double amount);
     }
 }

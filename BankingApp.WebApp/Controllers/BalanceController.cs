@@ -4,18 +4,19 @@ using System.Web.Http;
 namespace BankingApp.WebApp.Controllers
 {
     [Authorize]
-    public class BalanceController : ApiController
+    public class BalanceController : BaseApiController
     {
-        private IFinancialService financialService;
+        private IFinancialService _financialService;
         
-        public BalanceController(IFinancialService FinancialService)
+        public BalanceController(IFinancialService financialService)
         {
-            financialService = FinancialService;
+            _financialService = financialService;
         }
         
-        public IHttpActionResult Get(int id)
+        public IHttpActionResult Get()
         {
-            var requestResult = financialService.GetBalance(id);
+            int userId = GetCurrentUserId();
+            var requestResult = _financialService.GetBalance(userId);
 
             if (requestResult.success)
             {
@@ -26,6 +27,6 @@ namespace BankingApp.WebApp.Controllers
             {
                 return BadRequest(requestResult.message);
             }
-        }       
+        }
     }
 }

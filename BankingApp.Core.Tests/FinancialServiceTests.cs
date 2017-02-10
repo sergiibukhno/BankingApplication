@@ -18,39 +18,39 @@ namespace BankingApp.Core.Tests
         [Test]
         public void GetBalance_InvalidUserId_ErrorReturned()
         {            
-            var mockRepo = new Mock<IUserRepository>();            
-            var mockUnit = new Mock<IUnitOfWork>();
-            mockUnit.Setup(u => u.Users).Returns(mockRepo.Object);
-            var _mock = new Mock<IUnitOfWorkFactory>();
-            _mock.Setup(m => m.GetUnitOfWork()).Returns(mockUnit.Object);            
-            var financialService = new FinancialService(_mock.Object);
+            var mockUserRepo = new Mock<IUserRepository>();            
+            var mockUnitOfWork = new Mock<IUnitOfWork>();
+            mockUnitOfWork.Setup(u => u.Users).Returns(mockUserRepo.Object);
+            var _mockUnitOfWorkFactory = new Mock<IUnitOfWorkFactory>();
+            _mockUnitOfWorkFactory.Setup(m => m.GetUnitOfWork()).Returns(mockUnitOfWork.Object);            
+            var financialService = new FinancialService(_mockUnitOfWorkFactory.Object);
 
             var result = financialService.GetBalance(-2);
 
             Assert.AreEqual(false, result.success);
             Assert.AreEqual("User not found", result.message);            
-            _mock.Verify(mock => mock.GetUnitOfWork(), Times.Once());
-            mockRepo.Verify(r => r.GetUser(It.IsAny<int>()), Times.Once());            
+            _mockUnitOfWorkFactory.Verify(mock => mock.GetUnitOfWork(), Times.Once());
+            mockUserRepo.Verify(r => r.GetUser(It.IsAny<int>()), Times.Once());            
         }
 
         [Test]
         public void GetBalance_ValidUserId_BalanceReturned()
         {
             var user = new User { Id = 7, Name = "Anna", Balance = 2700 };
-            var mockRepo = new Mock<IUserRepository>();
-            mockRepo.Setup(r => r.GetUser(7)).Returns(user);
-            var mockUnit = new Mock<IUnitOfWork>();
-            mockUnit.Setup(u => u.Users).Returns(mockRepo.Object);
-            var _mock = new Mock<IUnitOfWorkFactory>();
-            _mock.Setup(m => m.GetUnitOfWork()).Returns(mockUnit.Object);
-            var financialService = new FinancialService(_mock.Object);
+            var mockUserRepo = new Mock<IUserRepository>();
+            mockUserRepo.Setup(r => r.GetUser(7)).Returns(user);
+            var mockUnitOfWork = new Mock<IUnitOfWork>();
+            mockUnitOfWork.Setup(u => u.Users).Returns(mockUserRepo.Object);
+            var _mockUnitOfWorkFactory = new Mock<IUnitOfWorkFactory>();
+            _mockUnitOfWorkFactory.Setup(m => m.GetUnitOfWork()).Returns(mockUnitOfWork.Object);
+            var financialService = new FinancialService(_mockUnitOfWorkFactory.Object);
 
             var result = financialService.GetBalance(7);
 
             Assert.AreEqual(true, result.success);
             Assert.AreEqual(2700, result.responseContent);
-            _mock.Verify(mock => mock.GetUnitOfWork(), Times.Once());
-            mockRepo.Verify(r => r.GetUser(It.IsAny<int>()), Times.Once());
+            _mockUnitOfWorkFactory.Verify(mock => mock.GetUnitOfWork(), Times.Once());
+            mockUserRepo.Verify(r => r.GetUser(It.IsAny<int>()), Times.Once());
         }
 
         [Test]
@@ -66,19 +66,19 @@ namespace BankingApp.Core.Tests
             mockUserRepo.Setup(r => r.GetUser(7)).Returns(user);
             var mockTransactionRepo = new Mock<IFinancialTransactionRepository>();
             mockTransactionRepo.Setup(t => t.Get(7)).Returns(transactions);
-            var mockUnit = new Mock<IUnitOfWork>();
-            mockUnit.Setup(u => u.Users).Returns(mockUserRepo.Object);
-            mockUnit.Setup(u => u.Transactions).Returns(mockTransactionRepo.Object);
-            var _mock = new Mock<IUnitOfWorkFactory>();
-            _mock.Setup(m => m.GetUnitOfWork()).Returns(mockUnit.Object);
-            var financialService = new FinancialService(_mock.Object);
+            var mockUnitOfWork = new Mock<IUnitOfWork>();
+            mockUnitOfWork.Setup(u => u.Users).Returns(mockUserRepo.Object);
+            mockUnitOfWork.Setup(u => u.Transactions).Returns(mockTransactionRepo.Object);
+            var _mockUnitOfWorkFactory = new Mock<IUnitOfWorkFactory>();
+            _mockUnitOfWorkFactory.Setup(m => m.GetUnitOfWork()).Returns(mockUnitOfWork.Object);
+            var financialService = new FinancialService(_mockUnitOfWorkFactory.Object);
 
             var result = financialService.GetTransactionsStatements(7);
 
             Assert.AreEqual(true, result.success);
             Assert.AreEqual(4, result.responseContent.Count);
             Assert.AreEqual(100, result.responseContent[0].amount);
-            _mock.Verify(mock => mock.GetUnitOfWork(), Times.Once());
+            _mockUnitOfWorkFactory.Verify(mock => mock.GetUnitOfWork(), Times.Once());
             mockUserRepo.Verify(r => r.GetUser(It.IsAny<int>()), Times.Once());
             mockTransactionRepo.Verify(t=>t.Get(It.IsAny<int>()),Times.Once());
         }
@@ -87,18 +87,18 @@ namespace BankingApp.Core.Tests
         public void GetTransactionsStatements_InvalidUserId_ErrorReturned()
         {            
             var mockUserRepo = new Mock<IUserRepository>();            
-            var mockUnit = new Mock<IUnitOfWork>();
-            mockUnit.Setup(u => u.Users).Returns(mockUserRepo.Object);            
-            var _mock = new Mock<IUnitOfWorkFactory>();
-            _mock.Setup(m => m.GetUnitOfWork()).Returns(mockUnit.Object);
-            var financialService = new FinancialService(_mock.Object);
+            var mockUnitOfWork = new Mock<IUnitOfWork>();
+            mockUnitOfWork.Setup(u => u.Users).Returns(mockUserRepo.Object);
+            var _mockUnitOfWorkFactory = new Mock<IUnitOfWorkFactory>();
+            _mockUnitOfWorkFactory.Setup(m => m.GetUnitOfWork()).Returns(mockUnitOfWork.Object);
+            var financialService = new FinancialService(_mockUnitOfWorkFactory.Object);
 
             var result = financialService.GetTransactionsStatements(-1);
 
             Assert.AreEqual(false, result.success);
             Assert.AreEqual(null, result.responseContent);
             Assert.AreEqual("User not found", result.message);
-            _mock.Verify(mock => mock.GetUnitOfWork(), Times.Once());
+            _mockUnitOfWorkFactory.Verify(mock => mock.GetUnitOfWork(), Times.Once());
             mockUserRepo.Verify(r => r.GetUser(It.IsAny<int>()), Times.Once());            
         }
 
@@ -108,22 +108,22 @@ namespace BankingApp.Core.Tests
             var sendingUser = new User { Id = 7, Name = "Anna", Balance = 2700 };
             var receivingUser = new User { Id = 5, Name = "Olya", Balance = 200 };
             var transferModel = new TransferViewModel { userId = 7, toUserId = 5, amount = 700 };
-            var mockRepo = new Mock<IUserRepository>();
-            mockRepo.Setup(r => r.GetUser(7)).Returns(sendingUser);
-            mockRepo.Setup(r => r.GetUser(5)).Returns(receivingUser);
-            var mockUnit = new Mock<IUnitOfWork>();
-            mockUnit.Setup(u => u.Users).Returns(mockRepo.Object);
-            var _mock = new Mock<IUnitOfWorkFactory>();
-            _mock.Setup(m => m.GetUnitOfWork()).Returns(mockUnit.Object);
-            var financialService = new FinancialService(_mock.Object);
+            var mockUserRepo = new Mock<IUserRepository>();
+            mockUserRepo.Setup(r => r.GetUser(7)).Returns(sendingUser);
+            mockUserRepo.Setup(r => r.GetUser(5)).Returns(receivingUser);
+            var mockUnitOfWork = new Mock<IUnitOfWork>();
+            mockUnitOfWork.Setup(u => u.Users).Returns(mockUserRepo.Object);
+            var _mockUnitOfWorkFactory = new Mock<IUnitOfWorkFactory>();
+            _mockUnitOfWorkFactory.Setup(m => m.GetUnitOfWork()).Returns(mockUnitOfWork.Object);
+            var financialService = new FinancialService(_mockUnitOfWorkFactory.Object);
 
-            var result = financialService.PerformFinancialOperation(transferModel);
+            var result = financialService.Transfer(transferModel);
 
             Assert.AreEqual(true, result.success);
             Assert.AreEqual(2000, result.responseContent);
-            _mock.Verify(mock => mock.GetUnitOfWork(), Times.Once());
-            mockRepo.Verify(r => r.GetUser(It.IsAny<int>()), Times.Exactly(2));
-            mockUnit.Verify(u => u.Save(), Times.Once());
+            _mockUnitOfWorkFactory.Verify(mock => mock.GetUnitOfWork(), Times.Once());
+            mockUserRepo.Verify(r => r.GetUser(It.IsAny<int>()), Times.Exactly(2));
+            mockUnitOfWork.Verify(u => u.Save(), Times.Once());
         }
 
         [Test]
@@ -131,21 +131,21 @@ namespace BankingApp.Core.Tests
         {
             var user = new User { Id = 7, Name = "Anna", Balance = 2700 };            
             var depositModel = new DepositViewModel { userId = 7, amount = 300 };
-            var mockRepo = new Mock<IUserRepository>();
-            mockRepo.Setup(r => r.GetUser(7)).Returns(user);            
-            var mockUnit = new Mock<IUnitOfWork>();
-            mockUnit.Setup(u => u.Users).Returns(mockRepo.Object);
-            var _mock = new Mock<IUnitOfWorkFactory>();
-            _mock.Setup(m => m.GetUnitOfWork()).Returns(mockUnit.Object);
-            var financialService = new FinancialService(_mock.Object);
+            var mockUserRepo = new Mock<IUserRepository>();
+            mockUserRepo.Setup(r => r.GetUser(7)).Returns(user);            
+            var mockUnitOfWork = new Mock<IUnitOfWork>();
+            mockUnitOfWork.Setup(u => u.Users).Returns(mockUserRepo.Object);
+            var _mockUnitOfWorkFactory = new Mock<IUnitOfWorkFactory>();
+            _mockUnitOfWorkFactory.Setup(m => m.GetUnitOfWork()).Returns(mockUnitOfWork.Object);
+            var financialService = new FinancialService(_mockUnitOfWorkFactory.Object);
 
-            var result = financialService.PerformFinancialOperation(depositModel);
+            var result = financialService.Deposit(depositModel);
 
             Assert.AreEqual(true, result.success);
             Assert.AreEqual(3000, result.responseContent);
-            _mock.Verify(mock => mock.GetUnitOfWork(), Times.Once());
-            mockRepo.Verify(r => r.GetUser(It.IsAny<int>()), Times.Once());
-            mockUnit.Verify(u => u.Save(), Times.Once());
+            _mockUnitOfWorkFactory.Verify(mock => mock.GetUnitOfWork(), Times.Once());
+            mockUserRepo.Verify(r => r.GetUser(It.IsAny<int>()), Times.Once());
+            mockUnitOfWork.Verify(u => u.Save(), Times.Once());
         }
 
         [Test]
@@ -153,21 +153,21 @@ namespace BankingApp.Core.Tests
         {
             var user = new User { Id = 7, Name = "Anna", Balance = 2700 };
             var withdrawModel = new WithdrawViewModel { userId = 7, amount = 2700 };
-            var mockRepo = new Mock<IUserRepository>();
-            mockRepo.Setup(r => r.GetUser(7)).Returns(user);
-            var mockUnit = new Mock<IUnitOfWork>();
-            mockUnit.Setup(u => u.Users).Returns(mockRepo.Object);
-            var _mock = new Mock<IUnitOfWorkFactory>();
-            _mock.Setup(m => m.GetUnitOfWork()).Returns(mockUnit.Object);
-            var financialService = new FinancialService(_mock.Object);
+            var mockUserRepo = new Mock<IUserRepository>();
+            mockUserRepo.Setup(r => r.GetUser(7)).Returns(user);
+            var mockUnitOfWork = new Mock<IUnitOfWork>();
+            mockUnitOfWork.Setup(u => u.Users).Returns(mockUserRepo.Object);
+            var _mockUnitOfWorkFactory = new Mock<IUnitOfWorkFactory>();
+            _mockUnitOfWorkFactory.Setup(m => m.GetUnitOfWork()).Returns(mockUnitOfWork.Object);
+            var financialService = new FinancialService(_mockUnitOfWorkFactory.Object);
 
-            var result = financialService.PerformFinancialOperation(withdrawModel);
+            var result = financialService.Withdraw(withdrawModel);
 
             Assert.AreEqual(true, result.success);
             Assert.AreEqual(0, result.responseContent);
-            _mock.Verify(mock => mock.GetUnitOfWork(), Times.Once());
-            mockRepo.Verify(r => r.GetUser(It.IsAny<int>()), Times.Once());
-            mockUnit.Verify(u => u.Save(), Times.Once());
+            _mockUnitOfWorkFactory.Verify(mock => mock.GetUnitOfWork(), Times.Once());
+            mockUserRepo.Verify(r => r.GetUser(It.IsAny<int>()), Times.Once());
+            mockUnitOfWork.Verify(u => u.Save(), Times.Once());
         }
 
         [Test]
@@ -175,41 +175,41 @@ namespace BankingApp.Core.Tests
         {
             var user = new User { Id = 7, Name = "Anna", Balance = 2700 };
             var withdrawModel = new WithdrawViewModel { userId = 7, amount = 3000 };
-            var mockRepo = new Mock<IUserRepository>();
-            mockRepo.Setup(r => r.GetUser(7)).Returns(user);
-            var mockUnit = new Mock<IUnitOfWork>();
-            mockUnit.Setup(u => u.Users).Returns(mockRepo.Object);
-            var _mock = new Mock<IUnitOfWorkFactory>();
-            _mock.Setup(m => m.GetUnitOfWork()).Returns(mockUnit.Object);
-            var financialService = new FinancialService(_mock.Object);
+            var mockUserRepo = new Mock<IUserRepository>();
+            mockUserRepo.Setup(r => r.GetUser(7)).Returns(user);
+            var mockUnitOfWork = new Mock<IUnitOfWork>();
+            mockUnitOfWork.Setup(u => u.Users).Returns(mockUserRepo.Object);
+            var _mockUnitOfWorkFactory = new Mock<IUnitOfWorkFactory>();
+            _mockUnitOfWorkFactory.Setup(m => m.GetUnitOfWork()).Returns(mockUnitOfWork.Object);
+            var financialService = new FinancialService(_mockUnitOfWorkFactory.Object);
 
-            var result = financialService.PerformFinancialOperation(withdrawModel);
+            var result = financialService.Withdraw(withdrawModel);
 
             Assert.AreEqual(false, result.success);            
             Assert.AreEqual("You dont have enough money", result.message);
-            _mock.Verify(mock => mock.GetUnitOfWork(), Times.Once());
-            mockRepo.Verify(r => r.GetUser(It.IsAny<int>()), Times.Once());
-            mockUnit.Verify(u => u.Save(), Times.Never());
+            _mockUnitOfWorkFactory.Verify(mock => mock.GetUnitOfWork(), Times.Once());
+            mockUserRepo.Verify(r => r.GetUser(It.IsAny<int>()), Times.Once());
+            mockUnitOfWork.Verify(u => u.Save(), Times.Never());
         }
 
         [Test]
         public void PerformFinancialOperation_WrongUserId_ErrorReturned()
         {            
             var withdrawModel = new WithdrawViewModel { userId = -2, amount = 3000 };
-            var mockRepo = new Mock<IUserRepository>();            
-            var mockUnit = new Mock<IUnitOfWork>();
-            mockUnit.Setup(u => u.Users).Returns(mockRepo.Object);
-            var _mock = new Mock<IUnitOfWorkFactory>();
-            _mock.Setup(m => m.GetUnitOfWork()).Returns(mockUnit.Object);
-            var financialService = new FinancialService(_mock.Object);
+            var mockUserRepo = new Mock<IUserRepository>();            
+            var mockUnitOfWork = new Mock<IUnitOfWork>();
+            mockUnitOfWork.Setup(u => u.Users).Returns(mockUserRepo.Object);
+            var _mockUnitOfWorkFactory = new Mock<IUnitOfWorkFactory>();
+            _mockUnitOfWorkFactory.Setup(m => m.GetUnitOfWork()).Returns(mockUnitOfWork.Object);
+            var financialService = new FinancialService(_mockUnitOfWorkFactory.Object);
 
-            var result = financialService.PerformFinancialOperation(withdrawModel);
+            var result = financialService.Withdraw(withdrawModel);
 
             Assert.AreEqual(false, result.success);
             Assert.AreEqual("User not found", result.message);
-            _mock.Verify(mock => mock.GetUnitOfWork(), Times.Once());
-            mockRepo.Verify(r => r.GetUser(It.IsAny<int>()), Times.Once());
-            mockUnit.Verify(u => u.Save(), Times.Never());
+            _mockUnitOfWorkFactory.Verify(mock => mock.GetUnitOfWork(), Times.Once());
+            mockUserRepo.Verify(r => r.GetUser(It.IsAny<int>()), Times.Once());
+            mockUnitOfWork.Verify(u => u.Save(), Times.Never());
         }
     }
 }

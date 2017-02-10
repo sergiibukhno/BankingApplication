@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <base href="/">
+    <title></title>
+    <script src="Scripts/angular.js"></script>
+    <script src="Scripts/angular-route.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+    <link href="Content/Site.css" rel="stylesheet" />
+    <script src="app/Scripts/app.js"></script>
+    <script src="app/Scripts/ConstService.js"></script>
+    <script src="app/Scripts/FinancialService.js"></script>
+    <script src="app/Scripts/AccountService.js"></script>
+    <script src="app/Controllers/RegisterController.js"></script>
+    <script src="app/Controllers/LoginController.js"></script>
+    <script src="app/Controllers/AccountController.js"></script>
+    <script src="app/Controllers/TransactionController.js"></script>
+    <script src="app/Controllers/DepositController.js"></script>
+    <script src="app/Controllers/WithdrawController.js"></script>
+    <script src="app/Controllers/TransferController.js"></script>
+</head>
+<body data-ng-app="bankingApp">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <div ng-show="userAuth">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>                
+                <a class="navbar-brand" href="/">Banking Application</a>
+            </div>
+            <div id="navbar" class="collapse navbar-collapse">
+                <div ng-show="userAuth">
+                    <a href="" data-toggle="collapse" data-target="#navbar" class="btn btn-info navbar-btn navbar-right" ng-click="logOut()">Logout</a>
+                    <ul class="nav navbar-nav">
+                        <li><a data-toggle="collapse" data-target="#navbar" href="/Account">Account</a></li>
+                        <li><a data-toggle="collapse" data-target="#navbar" href="/Deposit">Deposit</a></li>
+                        <li><a data-toggle="collapse" data-target="#navbar" href="/Withdraw">Withdraw</a></li>
+                        <li><a data-toggle="collapse" data-target="#navbar" href="/Transfer">Transfer</a></li>
+                        <li><a data-toggle="collapse" data-target="#navbar" href="/UserTransactions">My transactions</a></li>
+                    </ul>
+                </div>                
+            </div>
+        </div>
+    </nav>
+    <div class="jumbotron">        
+        <div data-ng-view></div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</body>
+</html>

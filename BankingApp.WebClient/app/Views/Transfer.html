@@ -1,0 +1,32 @@
+﻿<div class="container">
+    <hr />
+    <div class="row">
+        <div class="col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <caption>Select user you want to send money to:</caption>
+                    <tbody ng-repeat="user in users">
+                        <tr data-toggle="collapse" data-target="#transferForm" ng-click="setToUserId(user.Id)">
+                            <td>{{user.Id}}</td>
+                            <td>{{user.Name}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>  	
+        </div>
+    </div>
+    <form method="POST" id="transferForm" class="collapse">
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4">
+                <label for="transferAmount">Enter amount you want to transfer:</label>
+                <input name="transferAmount" class="form-control" type="number" ng-model="transferAmount">
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4">
+                <button class="btn btn-primary" ng-click="transfer()">Transfer</button>
+            </div>
+        </div>
+    </form>
+</div>

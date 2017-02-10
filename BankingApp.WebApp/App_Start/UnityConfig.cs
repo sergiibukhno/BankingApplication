@@ -1,5 +1,7 @@
 using BankingApp.Core.AccountServices;
+using BankingApp.Core.AppSettings;
 using BankingApp.Core.FinancialServices;
+using BankingApp.Core.TokenHandler;
 using BankingApp.Core.UserServices;
 using BankingApp.DataRepository.DataContext;
 using BankingApp.DataRepository.UnitOfWork;
@@ -21,6 +23,7 @@ namespace BankingApp.WebApp
             container.RegisterType<IUnitOfWorkFactory, UnitOfWorkFactory>();
             container.RegisterType<IAccountService, AccountService>();
             container.RegisterType<IAppSettings, AppSettingsWrapper>();
+            container.RegisterType<ITokenHandler, TokenHandler>();
             GlobalConfiguration.Configuration.DependencyResolver = new UnityDependencyResolver(container);
         }
     }

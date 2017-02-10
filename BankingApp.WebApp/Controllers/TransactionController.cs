@@ -4,7 +4,7 @@ using System.Web.Http;
 namespace BankingApp.WebApp.Controllers
 {
     [Authorize]
-    public class TransactionController : ApiController
+    public class TransactionController : BaseApiController
     {
         private IFinancialService financialService;
         
@@ -13,9 +13,10 @@ namespace BankingApp.WebApp.Controllers
             financialService = FinancialService;
         }
         
-        public IHttpActionResult Get(int id)
+        public IHttpActionResult Get()
         {
-            var requestResult = financialService.GetTransactionsStatements(id);
+            int userId = GetCurrentUserId();
+            var requestResult = financialService.GetTransactionsStatements(userId);
 
             if (requestResult.success)
             {
